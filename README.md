@@ -32,10 +32,7 @@ $ node app.js&
 - [ ] Drag&Drop des posts dans la page de modification -> Trouver une façon optimale de stocker les préférences (serveur ou local) -> c'est loooourd
 - [ ] Système de Permissions
 - [ ] Système de modification de mot de passe
-<<<<<<< HEAD
 
 ### Erreurs possibles
 - Le client ne se met pas à jour: Vérifier que l'adresse IP utilisée pour connecter le socket est bien celle du serveur
 - Crash du client: Vérifier que l'API ne s'est pas arrêtée, si c'est le cas, la relancer avec `node app.js`
-=======
->>>>>>> 44c4cc52546e7dd72a2463d79903442c87305a39
