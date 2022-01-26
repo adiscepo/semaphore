@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title><%- post.text %></title>
+        <link rel="stylesheet" href="/css/style.css">
+    </head>
+    <body style="background: linear-gradient(to right, #2389a8, #3fb2cf)";>
+        <% if (background != "default") { %>
+            <img id="frame" src="/img/background/<%= background.path %>">
+            <% } else { %>
+            <img id="frame" src="">
+        <% }%>
+        <div id="box_color" style="background-color: <%- post.color %>;">
+            <p id="text"><%- post.text %></p>
+            <p id="sub_text"><%- post.sub_text %></p>
+        </div>
+    </body>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io('127.0.0.1:1337');
+        socket.on('update_post', (post) => {
+            console.log("Socket reçu")
+            if (post.id_author == "<%= post.id_author %>"){
+                document.title = post.text
+                document.getElementById("text").innerHTML = post.text;
+                document.getElementById("sub_text").innerHTML = post.sub_text;
+                document.getElementById("box_color").style.backgroundColor = post.color;
+            }
+        })
+        socket.on('update_background', (background) => {
+            if (background.id_author == "<%= post.id_author %>"){
+                document.getElementById("frame").src = "/img/background/" + background.path;
+            }
+        })
+        var elem = document.documentElement;
+        
+        // Passer en fullscreen
+        function openFullscreen() {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) { /* IE11 */
+                elem.msRequestFullscreen();
+            }
+        }
+        
+        // Retirer le fullscreen
+        function closeFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) { /* Safari */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE11 */
+                document.msExitFullscreen();
+            }
+        }
+        var isFullscreen = false
+        document.addEventListener("keypress", function(event) {
+	        if (event.keyCode == 32) {
+                if(!isFullscreen) {
+                    openFullscreen()
+                    isFullscreen = true
+                }else{
+                    closeFullscreen()
+                    isFullscreen = false
+                }
+            }
+        });
+        </script>
+</html>

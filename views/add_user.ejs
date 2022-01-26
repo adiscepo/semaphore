@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ajouter un utilisateur</title>
+    </head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        body, form {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        label {
+            margin: 15px;
+        }
+        #ok {
+            font-style: normal;
+            display: none;
+        }
+    </style>
+    <body>
+        <a href="/">back</a>
+        <span id="error" style="color: red;"></span>
+        <form action="/add_user"  method="POST">
+            <label for="name">
+                Nom:
+                <input type="text" id="name" name="name">
+            </label>
+            <br>
+            <label for="passwd">
+                Mot de passe:
+                <input type="password" id="passwd" name="passwd">
+            </label>
+            <br>
+            <label for="conf_passwd">
+                Confirmer mot de passe:
+                <input type="password" id="conf_passwd" name="conf_passwd">
+                <i id="ok">✅</i>
+            </label>
+            <button type="submit" id="submit_button" disabled>Ajouter</button>
+        </form> 
+    </body>
+    <script type="text/javascript">
+        var error_span = document.getElementById("error");
+        const errorParams = new URLSearchParams(window.location.search).get("err")
+        if (errorParams != "" && errorParams != undefined) showError(errorParams);
+
+        var psswd_ok = false;
+        var psswd  = document.getElementById("passwd");
+        var psswd2 = document.getElementById("conf_passwd");
+        var button = document.querySelector("#submit_button");
+        var ok_box = document.getElementById("ok");
+        psswd.addEventListener("keyup", check_passwd, false);   
+        psswd2.addEventListener("keyup", check_passwd, false);
+
+        function check_passwd() {
+            if (psswd2.value != ""){
+                if (psswd.value == psswd2.value) {
+                    ok_box.style.display = "initial";
+                    button.disabled = false;
+                    psswd_ok = true;
+                } 
+                else {
+                    ok_box.style.display = "none";
+                    button.disabled = true;
+                    psswd_ok = false;
+                }
+            }else{
+                button.disabled = true;
+                ok_box.style.display = "none";
+            }
+        }
+
+        function showError(error) { error_span.innerHTML = error; }
+    </script>
+</html>

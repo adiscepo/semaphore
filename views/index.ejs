@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sémaphore</title>
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="manifest" href="manifest.json" />
+        <link rel="stylesheet" href="/css/choice_user.css">
+        <link rel="stylesheet" href="/css/fonts.css">
+        <link rel="stylesheet" href="/css/modal.css">
+        <script src="https://kit.fontawesome.com/8f3a233fc9.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <div id="search_bar_box">
+            <i></i>
+            <input onclick="closeAllOptionsBox()" type="text" id="input_search" placeholder="︁Chercher" autocomplete="off">
+        </div>
+        <div id="body">
+            <% for(const [id, user] of Object.entries(users)){ %>
+            <div class="list_group_item">
+                <div class="username_box" name="username_box">
+                    <p class="item_user"><%- user.name %></p>
+                </div>
+                <div class="actions_box">
+                    <a class="item_actions seen">Voir</a>
+                    <a class="item_actions modify" data-id="<%- id %>">Modifier</a>
+                </div>
+            </div>
+            <% }%>
+            <div class="list_group_item" id="add_user">
+                <a>+</a>
+            </div>
+        </div>
+        <div class="modal hide">
+            <div class="modal_content hide" id="modal_passwd">
+                <span>Mot de passe</span>
+                <form>
+                    <br>
+                    <input type="password" name="passwd" id="passwd_input">
+                    <button id="passwd_submit"><i class="fas fa-angle-right"></i></button>
+                    <label for="stay_connected">
+                        Rester connecté:
+                        <input type="checkbox" name="stay_connected" id="stay_connected">
+                    </label>
+                </form>
+                <span class="error" id="passwd_error"></span>
+                <span class="modal_close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal_content hide" id="modal_new_user">
+                <span>Ajouter un utilisateur</span>
+                <form id="newuser_form">
+                    <label for="newuser_username_input">Nom</label>
+                    <input autocomplete="off" type="text" name="username" id="newuser_username_input">
+                    <label for="newuser_passwd_input">Mot de passe</label>
+                    <input type="password" name="passwd" id="newuser_passwd_input">
+                    <label for="newuser_conf_passwd_input">Confirmer le mot de passe</label>
+                    <input type="password" name="conf_passwd" id="newuser_conf_passwd_input">
+                    <br>
+                    <button id="newuser_submit"><i class="fas fa-angle-right"></i></button>
+                </form>
+                <span class="error" id="newuser_error"></span>
+                <span class="modal_close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal_content hide" id="modal_manage">
+
+            </div>
+        </div>
+    </body>
+    <script>
+        var is_logged = "<%- isLogged %>";
+        if (is_logged == "true") is_logged = true
+        var user_id = '<%- userId %>';
+    </script>
+    <script src="/js/modal.js"></script>
+    <script>
+        // Barre de recherche
+        document.getElementById("input_search").addEventListener("keyup", (elem) => {
+            var value = elem.target.value.toLowerCase();
+            document.getElementsByName("username_box").forEach(element => {
+                if (value.length == 0){
+                    element.parentElement.classList.remove("hide");
+                }else{
+                    if (!element.children[0].textContent.toLowerCase().includes(value)) {
+                        element.parentElement.classList.add("hide");
+                    }else{
+                        element.parentElement.classList.remove("hide");
+                    }
+                }
+            })    
+        })
+        // Modals
+        var modal_passwd = document.getElementById("modal_passwd");
+        var modal_newuser = document.getElementById("modal_new_user");
+        var modal_manage = document.getElementById("modal_manage");
+        var btn_passwd = document.getElementById("passwd_submit"); 
+        var btn_newuser = document.getElementById("newuser_submit"); 
+        var input_passwd = document.getElementById("passwd_input"); 
+        // Actions sur les cards
+        document.getElementsByName("username_box").forEach(element => {
+            // Box vide -> Le clic va afficher les actions "Voir" et "Modifier" en fermant les actions des autres cards
+            element.addEventListener("click", () => {
+                if (!element.nextElementSibling.classList.contains("actions_box-visible")) {
+                    element.nextElementSibling.classList.toggle("actions_box-visible")
+                    closeAllOptionsBox(element)
+                } 
+                else element.nextElementSibling.classList.toggle("actions_box-visible");
+            })
+            // Boutons affichés lorsqu'on clique sur modifier -> Input pour le mot de passe et les boutons "Ok" et "Retour"
+            var button_seen = element.nextElementSibling.children[0]
+            var button_edit = element.nextElementSibling.children[1]
+            var id_card = button_edit.dataset.id
+            button_seen.addEventListener("click", (e) => {
+                window.location = "/view/" + id_card
+            })
+            button_edit.addEventListener("click", (e) => {
+                if (document.cookie) {
+                    // Check si il y'a une session sauvée sur le browser (cookie), et si oui check si l'id est le même que celui de la card
+                    if (document.cookie.match(/^(.*;)?\s*id_user\s*=\s*[^;]+(.*)?$/) == id_card.toString()) {
+                        getManageViewScreen()
+                    }else{
+                        modal.classList.remove("hide");
+                        modal_passwd.classList.remove("hide");
+                        document.getElementById("passwd_input").focus()
+                        modal_passwd.setAttribute('data-id', id_card)
+                    }
+                }else{
+                        modal.classList.remove("hide");
+                        modal_passwd.classList.remove("hide");
+                        document.getElementById("passwd_input").focus()
+                        modal_passwd.setAttribute('data-id', id_card)
+                    }
+            })
+            
+        });
+        input_passwd.addEventListener("click", (e) => {
+            btn_passwd.lastChild.classList.add("fa-angle-right")
+            btn_passwd.classList.remove("spinning")
+            btn_passwd.classList.remove("box_error")
+        })
+        btn_passwd.addEventListener("click", (e) => {
+            e.preventDefault()
+            btn_passwd.lastChild.classList.remove("fa-angle-right")
+            btn_passwd.classList.add("spinning")
+            var id = modal_passwd.dataset.id
+            var passwd = btn_passwd.previousElementSibling.value
+            var stayConnected = document.getElementById("stay_connected").checked
+            console.log(stayConnected);
+            checkIdentity(id, passwd, stayConnected).then((res) => {
+                if (res) {
+                    getManageViewScreen()
+                }else{
+                    document.getElementById("passwd_error").innerHTML = "<p>Mot de passe incorrect</p>"
+                    btn_passwd.classList.remove("spinning")
+                    btn_passwd.classList.add("box_error")
+                }
+            })
+        })
+        // Card Ajouter un utilisateur
+        document.getElementById("add_user").addEventListener("click", () => {
+            // window.location = "/add_user"
+            modal.classList.remove("hide");
+            modal_newuser.classList.remove("hide");
+            document.getElementById("passwd_input").focus()
+        })
+        btn_newuser.addEventListener("click", async (e) => {
+            e.preventDefault()
+            var newuser_error = document.getElementById("newuser_error")
+            var username = document.getElementById("newuser_username_input")
+            var passwd = document.getElementById("newuser_passwd_input")
+            var conf_passwd = document.getElementById("newuser_conf_passwd_input")
+            // Retire les styles ajouté précédemment
+            username.classList.remove("input_error")
+            passwd.classList.remove("input_error")
+            conf_passwd.classList.remove("input_error")
+            var newuser_datas = {name: username.value, passwd: passwd.value}
+            if (conf_passwd.value == passwd.value) {
+                let response = await fetch("/add_user", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(newuser_datas)
+                })
+                if (response.status == 409) {
+                    let data = await response.json()
+                    username.classList.add("input_error")
+                    newuser_error.innerHTML = "<p>" + data.error + "</p>"
+                }else if (response.status != 201) {
+                    let data = await response.json()
+                    if (data.error != undefined){
+                        newuser_error.innerHTML = "<p>" + data.error + "</p>"
+                        passwd.classList.add("input_error")
+                    }else{
+                        newuser_error.innerHTML = "<p> Une erreur s'est produite</p>"
+                        username.classList.add("input_error")
+                    }
+                }else{
+                    window.location.reload()
+                }
+            }else{
+                newuser_error.innerHTML = "<p>Les mots de passes ne correspondent pas</p>"
+                passwd.classList.add("input_error")
+                conf_passwd.classList.add("input_error")
+            }
+        })
+        // Ferme toutes les actions des cards (excepté de celle passée en paramétre)
+        function closeAllOptionsBox(except = undefined) {
+            document.getElementsByName("username_box").forEach(element => {
+                if (except != undefined){
+                    if (element.children[0].textContent != except.children[0].textContent)
+                    element.nextElementSibling.classList.remove("actions_box-visible");
+                }else{
+                   element.nextElementSibling.classList.remove("actions_box-visible");
+                }
+            })
+        }
+
+        function closeModal() {
+            modal.classList.add("hide");
+            modal_passwd.classList.add("hide");
+            modal_newuser.classList.add("hide");
+            modal_manage.classList.add("hide");
+            document.getElementById("passwd_input").value = ""
+            document.getElementById("passwd_error").innerText = ""
+            btn_passwd.lastChild.classList.add("fa-angle-right")
+            btn_passwd.classList.remove("spinning")
+            btn_passwd.classList.remove("box_error")
+        }
+
+        async function checkIdentity(id, passwd, stayConnected) {
+            var credentials = { id: id, passwd: passwd, stayConnected: stayConnected }
+            let response = await fetch("/register", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify(credentials)
+            })
+            if (response.status == 200) return true
+            else return false
+        }
+
+        function getManageViewScreen() {
+            window.location = "/manage/"
+            // fetch("/manage/").then(data => {
+            //     return data.text()
+            // }).then(html_content => {
+            //     modal.classList.remove("hide")
+            //     modal_passwd.classList.add("hide")
+            //     modal_manage.innerHTML = html_content
+            //     modal_manage.classList.remove("hide")
+            // })
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</html>

@@ -1,0 +1,153 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Oswald', 'Arial', sans-serif;
+  }
+  
+  body{
+    height: 100vh;
+    display: flex;
+    background: linear-gradient(to right, #f66464, #f77a3d);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+    font-weight: bold;
+    font-family: 'Arial';
+    color: #fff;
+  }
+  
+  #body *{
+    margin: 5px;
+    padding: 5px;
+    text-align: center;
+  }
+  
+  input, button{
+    background-color: #fff;
+    border: 0px solid black;
+    color: #888;
+    border-radius: 5px;
+  }
+  
+  #admin-form input[type=radio]{
+    margin: 7px 0;
+  }
+  
+  #welcome{
+    text-align: center;
+    font-weight: bold;
+    /* background-color: #1c9e54; */
+  }
+  
+  .liens{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .lienVersPerso{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 5px;
+    padding: 15px;
+    min-width: 250px;
+  }
+  
+  h1{
+    margin: 25px 0;
+    color: #fff;
+  }
+  
+  form{
+    /* background-color: #27ae60; */
+  }
+  
+  #frame{
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+  }
+  
+  img{
+    width: 320px;
+    height: 227px;
+    align-self: center;
+  }
+  
+  a{
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    background-color: #2980b9;
+    transition: all .2s ease;
+  }
+  
+  a:hover{
+    background-color: #1e608b;
+  }
+  
+  #box_color{
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    justify-content: center;
+    align-items: center;
+    bottom: 0;
+    height: 42vh;
+    width: 100vw;
+    /* background-color: #e74c3c; */
+    flex-grow: 1;
+    z-index: 1;
+    flex-direction: column;
+  }
+  
+  #text{
+    display: flex;
+    font-size: 8vw;
+    text-align: center;
+    font-weight: bold;
+    font-family: 'Oswald', sans-serif;
+    max-width: 100%;
+    color: #fff;
+    align-self: center;
+    justify-content: center;
+    margin-top: -5px;
+    /* text-shadow: -4px 4px #c0392b; */
+  }
+  
+  #sub_text{
+    display: flex;
+    font-size: 3vw;
+    text-align: center;
+    font-weight: bold;
+    font-family: 'Oswald', sans-serif;
+    max-width: 100%;
+    color: #fff;
+    align-self: center;
+    justify-content: center;
+    /* text-shadow: -4px 4px #c0392b; */
+  }
+  /* #unpb{
+    position: absolute;
+    width: 15vw;
+    top: 0;
+    line-height: 25px;
+    right: 0;
+  } */
+  
+  #editionprofil{
+    margin: 15px;
+    color: white;
+    /* background-color: #6cd640; */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  
+  #editionprofil *{
+    margin: 15px;
+  }

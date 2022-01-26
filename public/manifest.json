@@ -1,0 +1,7 @@
+{
+    "name": "Sémaphore web-service de sonnette",
+    "short_name": "Sémaphore",
+    "display": "standalone",
+    "orientation": "portrait",
+    "start_url": "/"
+}

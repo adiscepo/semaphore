@@ -1,0 +1,354 @@
+*::selection{
+
+}
+
+*{ 
+    font-family: "Oswald", sans-serif;
+}
+
+#body {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: row;
+}
+
+/* HEADER */
+
+header {
+    display: flex;
+    justify-content: flex-end;
+    margin: 1%;
+    position: relative;
+}
+
+#logout_button, #back_button, #edit_user_button {
+    text-decoration: none;
+    color: #000;
+    font-size: 1.2em;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+#back_button {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+#back_button::before {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-style: normal;
+    content: '\f060';
+}
+
+#logout_button::before {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-style: normal;
+    content: '\f2f5';
+}
+
+#logout_button:hover {
+    color: #EF5350;
+}
+
+.dark-mode {
+    background-color: #181a1b !important;
+    color: #e8e6e3 !important;
+}
+
+.dark::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-style: normal;
+    content: '\f186';
+}
+
+.light::before {
+    font-family: "Font Awesome 5 Free";
+    font-style: normal;
+    content: '\f186';
+}
+
+.dark {
+    cursor: pointer;
+}
+
+#darkmode_button {
+    font-size: 1.2em;
+    cursor: pointer;
+    margin-right: 15px;
+}
+
+#edit_user_button::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-style: normal;
+    content: "\f013";
+}
+
+/* POSTS */
+
+.posts_list {
+    display: flex;
+    flex-direction: column;
+    padding: 2%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.content {
+    display: flex;
+    position: relative;
+    align-items: stretch;
+    flex-direction: column;
+    font-weight: bold;
+    padding: 20px;
+    border-radius: 0.5em;
+    color: white;
+    width: 90%;
+    cursor: pointer;
+}
+
+.content:hover {
+    filter: grayscale(0);
+}
+
+.first_line {
+    font-size: 1.1em;
+}
+
+.second_line {
+    font-size: 0.8em;
+}
+
+.delete_post, .delete_background {
+    display: inline-block;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    opacity: 75%;
+}
+
+.delete_post:hover, .delete_background:hover {
+    opacity: 50%;
+}
+
+a {
+    display: inline-block;
+    transform: scale(1);
+    transition: transform .2s ease;
+}
+
+.current_post .selected::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-style: normal;
+    content: '\f058';
+    color: #fff;
+    margin: 0% 1% 0% 0%;
+}
+
+.current_post .delete_post{
+    display: inline-block;
+    transform: scale(0);
+    visibility: hidden;
+    transition: transform .2s ease, visibility 0s ease .2s;
+}
+
+#no_posts, #no_backgrounds {
+    display: flex;
+    flex-direction: column;
+    color: #9f9f9f;
+    font-size: 1.2em;
+    width: max-content;
+    margin: auto;
+    text-align: center;
+}
+
+#posts #no_posts img {
+    box-shadow: 2px 2px 20px #9f9f9f;
+    margin: 5% auto;
+    width: 75%;
+}
+
+#add_post_button, #add_background_button {
+    text-align: center;
+    border: 2px dashed #000;
+    cursor: pointer;
+    color: #000;
+}
+
+#add_background_button {
+    font-size: 1.2em;
+    padding: 5%;
+    margin: 2% 0;
+    display: inline-block;
+}
+
+
+/* Backgrounds */
+
+#posts, #backgrounds {
+    max-height: 90vh;
+    width: 40%;
+}
+
+#backgrounds_list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.content_background {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 50%;
+}
+
+.content_background img {
+    cursor: pointer;
+    padding: 1%;
+    width: 75%;
+    transition: transform .1s ease-in-out;
+}
+
+.current_background img {
+    border: 2px solid blueviolet;
+}
+
+.delete_background {
+    right: 5%;
+    font-size: 1.3em;
+    width: 1.3em;
+    height: 1.3em;
+    background-color: #e8e6e3;
+    border-radius: 50%;
+    text-align: center;
+    transition: transform .2s ease, visibility .2s ease;
+}
+
+.delete_background:hover {
+    background-color: #EF5350;
+}
+
+.current_background .delete_background{
+    display: inline-block;
+    transform: scale(0);
+    visibility: hidden;
+}
+
+/* Add post  */
+
+#actions {
+    width: 35%;
+    margin: 5% 0;
+    display: flex;
+    align-content: center;
+    flex-direction: column;
+}
+
+#actions form {
+    margin: 5% 0;
+    /* margin: auto; */
+}
+#actions span {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+#actions label {
+    display: block;
+}
+
+#actions input, #passwd_submit{
+    padding: 1em;
+}
+
+#actions input {
+    border-radius: 0.5em;
+    margin: 2% 0%;
+    width: 75%;
+    border: 1px solid #d7dde2;
+}
+
+#actions input[type=color] {
+    width: 10%;
+}
+
+#actions input:focus-visible {
+    outline: none;
+}
+
+#actions .input_error {
+    border: 1px solid #EF5350;
+}
+
+#actions button[type="submit"] {
+    padding: 3% 10%;
+    background-color: transparent;
+    color: black;
+    cursor: pointer;
+    border: 1px solid #d7dde2;
+    border-radius: 0.5em;
+}
+
+#actions button[type="submit"]:hover {
+    color: white;
+    background-color: #689F38;
+}
+
+.dropzone {
+    width: 90%;
+    padding: 1.5%;
+    transition: padding .2s ease;
+}
+
+.over {
+    /* border-radius: 0.5em; */
+    /* border: 3px dashed red; */
+    padding: 50px 1%;
+    /* margin: 1%; */
+    /* background-color: blueviolet !important; */
+    /* transform: scale(1.2); */
+}
+
+/* ----------- MEDIA QUERIES ----------- */
+
+@media screen and (max-width: 1000px) {
+    #body {
+        margin-top: 1vh;
+        flex-direction: column;
+    }
+    
+    #posts, #backgrounds {
+        width: 100%;
+    }    
+    
+    .posts_list{
+        align-items: center;
+    }
+    
+    .posts_list .content {
+        width: 90%;
+    }
+
+    .modal_content {
+        width: 80% !important;
+        padding: 5% !important;
+    }
+
+    #actions {
+        margin: auto;
+        width: 90%;
+        padding: 5%;
+    }
+
+    
+}

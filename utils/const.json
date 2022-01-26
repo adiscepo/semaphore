@@ -1,0 +1,6 @@
+{
+    "userdbl" : "User already exists",
+    "dbadd" : "Error during insertion in the database",
+    "shortpass": "Password must be at least 8 characters long",
+    "allfield": "All fields must be complete"
+}

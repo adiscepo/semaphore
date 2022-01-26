@@ -1,0 +1,171 @@
+/* ----------- MODAL ----------- */
+
+.modal {
+    display: block;
+    position: fixed;
+    z-index: 1;
+    padding-top: 15vh;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    left: 0;
+    top: 0;
+}
+
+.modal_content {
+    display: block;
+    position: relative;
+    background-color: #fefefe;
+    padding: 3% 1% 3% 2%;
+    width: 20%;
+    margin: auto;
+    border-radius: 0.5em;
+}
+
+.modal_content #newuser_form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 5%;
+}
+
+.modal_content span:not(.modal_close) {
+    display: block;
+    margin: 5% 0;
+    font-size: 1.2em;
+}
+
+.modal_content label {
+    display: block;
+}
+
+.modal_content input, #passwd_submit{
+    padding: 1em;
+}
+
+.modal_content input {
+    border-radius: 0.5em;
+    margin: 2% 0%;
+    width: 75%;
+    border: 1px solid #d7dde2;
+}
+
+.modal_content input[type=checkbox] {
+    width: initial;
+    margin-left: 5px;
+}
+
+.modal_content input:focus-visible {
+    outline: none;
+}
+
+.modal_content .input_error {
+    border: 1px solid #EF5350;
+}
+
+.modal_content #passwd_input {
+    border-radius: 0.5em 0 0 0.5em;
+    border-right: 0px;
+}
+
+.modal_content #passwd_submit {
+    border-radius: 0 0.5em 0.5em 0;
+    border: 1px solid #d7dde2;
+    background-color: transparent;
+    margin: -6px;
+    border-left: 0px;
+}
+
+.modal_content #passwd_submit:hover, .modal_content #passwd_submit:focus-visible, .modal_content #passwd_submit:focus {
+    background-color: #9CCC65;
+    color: white;
+    cursor: pointer;
+    outline: none;
+}
+
+.modal_content #passwd_submit:active {
+    background-color: #689F38;
+    color: white;
+    cursor: pointer;
+}
+
+.modal_content .submit_button, #newuser_submit, #change_passwd_submit {
+    padding: 3% 10%;
+    background-color: transparent;
+    color: black;
+    cursor: pointer;
+    border: 1px solid #d7dde2;
+    border-radius: 0.5em;
+}
+
+.modal_content .submit_button:hover, #newuser_submit:hover, #change_passwd_submit:hover {
+    color: white;
+    background-color: #689F38;
+}
+
+.modal_close {
+    position: absolute;
+    top: 10%;
+    right: 5%;
+    color: #aaaaaa;
+    float: right;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.modal_close:hover,
+.modal_close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.error {
+    color: #c62828b2;
+    font-weight: bold;
+}
+
+.spinning {
+    background-color: #FFCA28 !important;
+}
+
+.spinning i::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-style: normal;
+    content: "\f013";
+    color: white;
+}
+
+.spinning i {
+    animation-name: spinning;
+    animation-iteration-count: infinite;
+    animation-duration: 5s;
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1);
+}
+
+.box_error {
+    background-color: #EF5350 !important;
+    color: white;
+    cursor: pointer;
+    outline: none;
+}
+
+.box_error i::before {
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    font-style: normal;
+    content: "\f00d";
+}
+
+.hide {
+    display: none !important;
+}
+
+@media screen and (max-width: 1000px) {
+    .modal_content {
+        width: 50% !important;
+        padding: 5% !important;
+    }
+
+    
+}

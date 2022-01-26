@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="/css/manage.css">
+        <title>Manage <%- user.name %></title>
+        <link rel="stylesheet" href="/css/fonts.css">
+        <link rel="stylesheet" href="/css/modal.css">
+        <script src="https://kit.fontawesome.com/8f3a233fc9.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <header>
+            <a href="/" id="back_button"></a>
+            <i onclick="showModal('edit_profile_modal')" id="edit_user_button"></i>
+            <i id="darkmode_button" class="dark"></i>
+            <a href="/logout" id="logout_button"></a>
+        </header>
+        <div id="body">
+            <div id="posts">
+                <h1>Posts</h1>
+                <% if (posts.length == undefined) { %>
+                    <div id="no_posts">
+                        <h2>Pas de posts</h2> <span>Il ne tient qu'à vous d'en ajouter !</span>
+                        <img src="/img/thumbleweed.gif" alt="">
+                    </div>
+                    <div class="posts_list">    
+                        <div onclick="showModal('add_post')" class="content" id="add_post_button">
+                            <span>+</span>
+                        </div>
+                    </div>
+                <% }else{ %>
+                <div class="posts_list">
+                    <div class="dropzone"></div>
+                    <% for(const [i, post] of Object.entries(posts)){ %>
+                        <% if (id_current_post == post._id) { %>
+                        <div draggable="true" class="content current_post" data-deleted="false" data-id_card="<%- post._id %>" style="background-color: <%- post.color %>;">
+                            <% } else { %>
+                        <div draggable="true" class="content" data-deleted="false" data-id_card="<%- post._id %>" style="background-color: <%- post.color %>;">
+                            <% } %>
+                            <span class="first_line"><span class="selected"></span><%- post.text %></span>
+                            <span class="second_line"><%- post.sub_text %></span>
+                            <span name="delete_post" class="delete_post" id="<%- post._id %>">&times;</span>
+                        </div>
+                        <div class="dropzone"></div>
+                    <% }%>
+                    <div onclick="showModal('add_post')" class="content" id="add_post_button">
+                        <span>+</span>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+            <div id="backgrounds">
+                <h1>Image de fond</h1>
+                <% if (backgrounds.length == []) { %>
+                    <div id="no_backgrounds">
+                        <h2>Pas d'image de fond</h2>
+                    </div>
+                <% }else{ %>
+                    <div id="backgrounds_list">
+                        <% for(const [i, background] of Object.entries(backgrounds)){ %>
+                            <% if (id_current_background == background._id) { %>
+                                <div class="content_background current_background" data-deleted="false">
+                            <% } else { %>
+                                <div class="content_background" data-deleted="false">
+                            <% }%>
+                                    <img data-id_background="<%- background._id %>" src="/img/background/<%- background.path %>" alt="">
+                                    <span name="delete_background" class="delete_background" data-id_background="<%- background._id %>">&times;</span>
+                                </div>
+                        <% } %>
+                    </div>
+                <% }%>
+                <div >
+                    <span onclick="showModal('add_background')" id="add_background_button">+</span>
+                </div>
+            </div>
+            <div class="modal hide">
+                <div class="modal_content hide" id="edit_profile_modal">
+                    <span>Modifier mot de passe</span>
+                    <form method="post">
+                        <label for="current_passwd_input">Mot de passe actuel</label>
+                        <input type="password" name="passwd" id="current_passwd_input">
+                        <label for="new_passwd_input">Nouveau mot de passe</label>
+                        <input type="password" name="new_passwd" id="new_passwd_input">
+                        <button type="submit" id="change_passwd_submit" class="submit_button">Modifier</button>
+                    </form>
+                    <span class="error"></span>
+                    <span class="modal_close" onclick="closeModal()">&times;</span>
+                </div>
+                <div class="modal_content hide" id="add_post">
+                    <span>Ajouter un post</span>
+                    <form action="/add_post/<%- user._id %>" method="post">
+                        <label for="text">
+                            Texte:
+                        </label>
+                        <input type="text" id="text" name="text">
+                        <br>
+                        <label for="sub_text">
+                            Sous-texte:
+                        </label>
+                        <input type="text" id="sub_text" name="sub_text">
+                        <br>
+                        <label for="color">
+                            Fond:
+                            <input type="color" id="color" name="color">
+                        </label>
+                        <br>
+                        <button type="submit" class="submit_button" >Ajouter</button>
+                    </form>
+                </div>
+                <div class="modal_content hide" id="add_background">
+                    <span>Changer l'image de fond</span>
+                    <form action="/add_background/<%- user._id %>" method="post" enctype="multipart/form-data">
+                        <input type="file" name="background">
+                        <button type="submit" class="submit_button">Ajouter</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script src="/js/function.js"></script>
+    <script src="/js/modal.js"></script>
+    <script>
+    var id_user = "<%= user._id %>";
+    var id_current_post = "<%= id_current_post %>";
+    var id_current_background = "<%= id_current_background %>";
+    function setActionsOnCard() {
+        // CHANGE CURRENT POST
+        var cards = document.getElementsByClassName("content")
+        Array.prototype.forEach.call(cards, (val) => {
+            val.addEventListener("click", async (data) => {
+                if (val.dataset.deleted == "false") {
+                    var id_post = val.dataset.id_card;
+                    if (id_current_post != id_post){
+                        let response = await fetch("/manage/post/change_current", {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json;charset=utf-8'
+                            },
+                            body: JSON.stringify({ id_user: id_user, id_post: id_post })
+                        })
+                        if (response.ok) {
+                            // Change l'élément courant (selectionné)
+                            document.getElementsByClassName("current_post")[0].classList.remove("current_post");
+                            val.classList.add("current_post")
+                            id_current_post = id_post
+                        }
+                    }
+                }
+            })
+        });
+        // DELETE POST
+        document.getElementsByName("delete_post")
+        .forEach((val) => {
+            var id_post = val.id;
+            val.addEventListener("click", async (data) => {
+                val.parentElement.dataset.deleted = true // Permet d'éviter que le post ne soit considéré comme "cliqué" dans l'eventListener de la carte (voir fonction ci-dessus)
+                fetch("http://127.0.0.1:1337/manage/post/", {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body : JSON.stringify({ id_post: id_post })
+                }).then((res) => {
+                    if (res.status == 200 || res.status == 202) {
+                        val.parentElement.style.display = "none";
+                        val.parentElement.nextElementSibling.style.display = "none"; // efface la dropzone
+                    } else {
+                        console.log("Error")
+                        val.parentElement.dataset.deleted = "false" // On remet le dataset à false => permet de la rechoisir comme current
+                    }
+                })
+            })
+        });
+        // CHANGE CURRENT BACKGROUND
+        var backgrounds_card = document.getElementsByClassName("content_background")
+        Array.prototype.forEach.call(backgrounds_card, (val) => {
+            var id_background = val.children[1].dataset.id_background
+            val.addEventListener("click", async (data) => {
+                if (val.dataset.deleted == "false") {
+                    let response = await fetch("/manage/background/change_current", {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json;charset=utf-8'
+                        },
+                        body: JSON.stringify({ id_user: id_user, id_background: id_background })
+                    })
+                    if (response.ok) {
+                        // Change l'élément courant (selectionné)
+                        document.getElementsByClassName("current_background")[0].classList.remove("current_background");
+                        val.classList.add("current_background")
+                        id_current_background = id_background
+                    }    
+                }
+            })
+        });
+        // DELETE BACKGROUND
+        document.getElementsByName("delete_background")
+        .forEach((val) => {
+            var id_background = val.dataset.id_background;
+            var path_background = val.previousElementSibling.attributes.src.nodeValue;
+            val.addEventListener("click", async (data) => {
+                val.parentElement.dataset.deleted = true // Permet d'éviter que le post ne soit considéré comme "cliqué" dans l'eventListener de la carte (voir fonction ci-dessus)
+                fetch("http://127.0.0.1:1337/manage/background/", {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body : JSON.stringify({ id_background: id_background, path: path_background })
+                }).then((res) => {
+                    if (res.status == 200 || res.status == 202) {
+                        val.parentElement.style.display = "none";   
+                    } else {
+                        console.log("Error")
+                        val.parentElement.dataset.deleted = "false" // On remet le dataset à false => permet de la rechoisir comme current
+                    }
+                })
+            })
+        });
+    }
+    // CHANGE PASSWORD (Modal)
+    document.getElementById("change_passwd_submit")
+    .addEventListener("click", (e) => {
+        e.preventDefault()
+        var error_field = document.querySelector(".modal .error")
+        var passwd = document.getElementById("current_passwd_input")
+        var new_passwd = document.getElementById("new_passwd_input")
+        error_field.innerHTML = ""
+        fetch("http://127.0.0.1:2021/api/user/edit", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify({
+                id: id_user,
+                passwd: passwd.value,
+                new_passwd: new_passwd.value
+            })
+        }).then(async res => {
+            if (!res.ok){
+                let datas = await res.json()
+                passwd.value = ""
+                new_passwd.value = ""
+                error_field.innerHTML = datas.error
+            }else{
+                closeModal()
+            }
+        })
+    })
+    // Drag function
+    function dragstart(e) {
+        srcDrag = e.srcElement
+        srcDropzone = e.srcElement.nextElementSibling
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', this.outerHTML);
+    }
+    
+    function dragleave(e) {
+        e.stopPropagation();
+        this.classList.remove("over")
+    }
+    
+    function dragenter(e) {
+        this.classList.add("over")
+    }
+    
+    function dragover(e) {
+        e.preventDefault();
+        return false;
+    }
+    
+    function dragdrop(e) {
+        e.preventDefault()
+        // console.log(srcDrag)
+        this.outerHTML = "<div class='dropzone tmp_pos'></div>" + e.dataTransfer.getData('text/html') + this.outerHTML;
+        srcDrag.outerHTML = ""
+        srcDropzone.outerHTML = ""
+        this.style.backgroundColor = "blueviolet"
+        setDragAndDrop() // Active les nouveaux dropzone ajouté
+        setActionsOnCard() // Idem mais pour les cartes
+        // Si l'élement droppé possède 2 dropzone au dessus de lui on supprime un des deux dropzone
+        var prevdropzone = document.getElementsByClassName("tmp_pos")[0]
+        if (prevdropzone.previousElementSibling != undefined){
+            if (prevdropzone.previousElementSibling.classList.contains("dropzone")) {
+                prevdropzone.parentNode.removeChild(prevdropzone)
+            }else{
+                prevdropzone.classList.remove("tmp_pos")
+            }
+        }
+        return false;
+    }
+    
+    function dragend(e) {
+        e.preventDefault()
+        var dropzone = document.querySelectorAll('.dropzone');
+        Array.prototype.forEach.call(dropzone, function(item) {
+            item.classList.remove('over');
+        });
+    }
+
+    function addEventsDrag(elem) {
+        elem.addEventListener("dragstart", dragstart, false)
+        elem.addEventListener("dragend", dragend, false)
+    }
+    
+    function addEventsDrop(elem) {
+        elem.addEventListener("dragover", dragover, false)
+        elem.addEventListener("dragleave", dragleave, false)
+        elem.addEventListener("dragenter", dragenter, false)
+        elem.addEventListener("drop", dragdrop, false)
+    }
+    function setDragAndDrop(){
+        var draggable = document.getElementsByClassName("dropzone")
+        var content   = document.getElementsByClassName("content")
+        Array.prototype.forEach.call(draggable, elem => { addEventsDrop(elem) })
+        Array.prototype.forEach.call(content, elem => { addEventsDrag(elem) })
+    }
+
+    function showModal(id) {
+        modal.classList.remove("hide")
+        document.getElementById(id).classList.remove("hide")
+    }
+
+    function closeModal() {
+        modal.classList.add('hide')
+        modal.childNodes.forEach(child => {
+            if (child.classList != undefined) {
+                for(i = 0; i < child.classList.length; i++) {
+                    if (child.classList.item(i) == "modal_content") {
+                        child.classList.add("hide")
+                    }
+                }
+            }
+        })
+    }
+
+    setActionsOnCard()
+    setDragAndDrop()
+    </script>
+</html>
