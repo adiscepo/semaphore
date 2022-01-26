@@ -6,7 +6,7 @@ Cette version est une amélioration de celle de 2018. La sécurité (grâce à l
 L'architecture de cette version est aussi complètement différente (NodeJS et NoSQL à la place de PHP et de SQL)
 
 ### Mise en place
-Fonctionnne avec une base de données NoSQL (MongoDB) à travers une API (Sémaphore_API) qui donne accès à la gestion des utilisateurs, de leur session de connexion, des posts et des images de fond
+Fonctionnne avec une base de données NoSQL (MongoDB) à travers une API (./api) qui donne accès à la gestion des utilisateurs, de leur session de connexion, des posts et des images de fond
 #### Installation des dépendances
 * MongoDB (créer une db "semaphore")
 * Installer les dépendances NodeJS avec la commande `npm i` à la racine du dossier  
