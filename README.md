@@ -19,6 +19,10 @@ $ node app.js&
 $ cd ../
 $ node app.js&
 ```
+Ou
+```shell
+$ ./start.sh
+```
 
 ### Technologies utilisées:
 * NodeJS
@@ -35,4 +39,4 @@ $ node app.js&
 
 ### Erreurs possibles
 - Le client ne se met pas à jour: Vérifier que l'adresse IP utilisée pour connecter le socket est bien celle du serveur
-- Crash du client: Vérifier que l'API ne s'est pas arrêtée, si c'est le cas, la relancer avec `node app.js`
+- Crash du client: Vérifier que l'API ne s'est pas arrêtée, si c'est le cas, la relancer avec `./start.sh`
