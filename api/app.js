@@ -10,7 +10,7 @@ const background = require('./models/background');
 const current_background = require('./models/current_background');
 const cors = require("cors")
 const hash = require('./utils/hash')
-const log = require('./utils/log')
+const VERBOSE = process.argv.includes("-v")
 const port = 2021
 
 app.use((req, res, next) => {
@@ -31,6 +31,8 @@ var db = mongoose.connection;
 db.on('error', (err) => {
    log("Erreur lors de la connexion à la base de données");
 });
+
+function log(string) { if (VERBOSE) console.log(string); }
 
 // USER
 
@@ -304,10 +306,11 @@ app.put('/api/current/post/', (req, res) => {
         else{
             current_post.updateOne({ id_author: id_author}, {id_post: id_post}, (err, data) => {
                 if (err) log(err)
-                if (data.nModified) {
+                log(data)
+                if (data.modifiedCount) {
                     log("Current post updated")
                     res.status(202).end()
-                } else if (data.n == 0) { // Il n'existe pas de current_post pour cet user => on en crée un
+                } else if (data.matchedCount == 0) { // Il n'existe pas de current_post pour cet user => on en crée un
                     var new_current_post = new current_post({ id_author: id_author, id_post: id_post })
                     new_current_post.save((err, data) => {
                         if (err) log(err)
@@ -317,7 +320,7 @@ app.put('/api/current/post/', (req, res) => {
                         }
                     })
                 } 
-                else if (data.n == 1 && data.nModified == 0) {
+                else if (data.matchedCount == 1 && data.modifiedCount == 0) {
                     log("Choosed post is already the current post")
                     res.status(409).json({ error: "But nothing happends" }) // doublon
                 }
@@ -466,10 +469,10 @@ app.put('/api/current/background/', (req, res) => {
         else{
             current_background.updateOne({ id_author: id_author}, {id_background: id_background}, (err, data) => {
                 if (err) log(err)
-                if (data.nModified) {
+                if (data.modifiedCount) {
                     log("Current background updated")
                     res.status(202).end()
-                } else if (data.n == 0) { // Il n'existe pas de current_background pour cet user => on en crée un
+                } else if (data.matchedCount == 0) { // Il n'existe pas de current_background pour cet user => on en crée un
                     var new_current_background = new current_background({ id_author: id_author, id_background: id_background })
                     new_current_background.save((err, data) => {
                         if (err) log(err)
@@ -479,7 +482,7 @@ app.put('/api/current/background/', (req, res) => {
                         }
                     })
                 } 
-                else if (data.n == 1 && data.nModified == 0) {
+                else if (data.matchedCount == 1 && data.modifiedCount == 0) {
                     log("Choosed background is already the current background")
                     res.status(409).json({ error: "But nothing happends" }) // doublon
                 }
@@ -490,5 +493,7 @@ app.put('/api/current/background/', (req, res) => {
 })
 
 
-app.listen(port)
+app.listen(port, (err) => {
+    log("API started on port " + port)
+})
 module.exports = app;

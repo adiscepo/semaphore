@@ -11,6 +11,7 @@ const port = 1337;
 const io = require('socket.io')(server, { cors: { origin: '*' } });
 var multer = require('multer'); // Pour l'upload d'image
 const fs = require('fs'); // Suppression de fichier
+const VERBOSE = process.argv.includes("-v")
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -43,14 +44,17 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// app.io = io // Attache l'instance io à l'application
+function log(string) { if (VERBOSE) console.log(string); }
+
+app.io = io // Attache l'instance io à l'application
 
 app.use(express.static(__dirname + '/public')); // Donne accès au contenu du dossier "public" à la vue (fichier .ejs) (en gros)
 app.use(express.static(__dirname + '/utils'));
 app.use('/static', express.static('node_modules'));
+app.use("/utils/icons", express.static('icons')); 
 
 app.get("/", async (req, res, next) => {
-    console.log("[GET] /")
+    log("[GET] /")
     let response = await fetch("http://127.0.0.1:2021/api/user");
     if (response.ok){
         var datas = await response.json();
@@ -67,12 +71,12 @@ app.get("/", async (req, res, next) => {
 });
 
 app.get("/add_user", (req, res, next) => {
-    console.log("[GET] /add_user");
+    log("[GET] /add_user");
     res.render("add_user.ejs")
 });
 
 app.post("/add_user", async (req, res, next) => {
-    console.log("[POST] /add_user");
+    log("[POST] /add_user");
     var name    = req.body.name;
     var passwd  = req.body.passwd;
     var user = { name: name, passwd: passwd };
@@ -112,7 +116,7 @@ app.get('/view/:_id', async (req, res) => {
         var datas = await response_post.json();
         res.render("view.ejs", { post: datas, background: background_info });
     }else if (response_post.status == 404) {
-        console.log("Ce post n'existe pas")
+        log("Ce post n'existe pas")
         res.redirect("/")
     }else{
         res.redirect("/")
@@ -166,7 +170,7 @@ app.put("/manage/post/change_current", (req, res) => {
             if (response.status == 200 || response.status == 202) {
                 let current_post = await fetch("http://127.0.0.1:2021/api/post/" + id_post)
                 let current_post_datas = await current_post.json()
-                io.emit("update_post", current_post_datas)
+                req.app.io.emit("update_post", current_post_datas)
                 res.status(200).end()
                 return;
             }
@@ -192,7 +196,7 @@ app.put("/manage/background/change_current", (req, res) => {
             if (response.status == 200 || response.status == 202) {
                 let current_background = await fetch("http://127.0.0.1:2021/api/background/" + id_background)
                 let current_background_datas = await current_background.json()
-                io.emit("update_background", current_background_datas)
+                req.app.io.emit("update_background", current_background_datas)
                 res.status(200).end()
                 return;
             }
@@ -242,8 +246,8 @@ app.delete("/manage/background", async (req, res) => {
         }).then(response => {
             if(response.ok) {
                 fs.unlink("./public" + path_to_background, (err) => {
-                    if (err) console.log(err)
-                    else console.log(path_to_background + " supprimé")
+                    if (err) log(err)
+                    else log(path_to_background + " supprimé")
                 })
                 res.status(200).end()
                 return;
@@ -368,7 +372,7 @@ app.post("/add_background/:_id", async (req, res) => {
                             let data_background = await response.json()
                             let current_background = await fetch("http://127.0.0.1:2021/api/background/" + data_background._id)
                             let current_background_datas = await current_background.json()
-                            io.emit("update_background", current_background_datas)
+                            req.app.io.emit("update_background", current_background_datas)
                             res.status(200).redirect("/manage")
                         } else res.status(400).redirect("/manage")
                         return;
@@ -386,7 +390,7 @@ app.post("/add_background/:_id", async (req, res) => {
 // Socket.IO
 
 io.on('connection', function (socket) {
-    console.log("Connected succesfully to the socket ...");
+    log("Connected succesfully to the socket ...");
     
     socket.on('update', (id) => {
         socket.broadcast.emit('update_post', id)
@@ -415,6 +419,8 @@ function generateSecretKey(length = 32) {
     return res;
 }
 
-server.listen(port)
+server.listen(port, () => {
+    log("Application lauched on port " + port);
+})
 
 module.exports = app;
