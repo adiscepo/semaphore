@@ -237,7 +237,7 @@
         var passwd = document.getElementById("current_passwd_input")
         var new_passwd = document.getElementById("new_passwd_input")
         error_field.innerHTML = ""
-        fetch("http://127.0.0.1:2021/api/user/edit", {
+        fetch("http://" + ip + ":2021/api/user/edit", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
