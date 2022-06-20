@@ -24,6 +24,27 @@ Ou
 $ ./start.sh
 ```
 
+### Lancement avec Docker
+
+Le projet a été conteneurisé dans une image Docker pour permettre son déploiement rapide.
+Étant donné qu'il y'a 3 services différents qui tournent en même temps pour l'exécution du programme (le serveur web, l'API et MongoDB), les différentes images on été compilées avec Docker compose.
+Pour lancer les conteneurs, il suffit d'aller à la racine du projet et de lancer la commande
+```shell
+docker compose build
+```
+suivie de 
+```shell
+docker compose up -d
+```
+Des volumes on été utilisé pour permettre la sauvegarde des données (db mongo) et des backgrounds
+
+### Configuration
+
+Le serveur web tourne sur le port 80 et l'API sur le port 2021. 
+Le service mongo étant utilisé uniquement en interne pour l'API, son port (27017) n'a pas été exposé.
+
+L'ip de la machine exécutant le service doit être spécifié dans le champs "ip" du fichier `./utils/config.js` (ainsi que le port si celui-ci est modifié), attention il s'agit bien de l'ip de la machine et pas du conteneur !
+
 ### Technologies utilisées:
 * NodeJS
 * Express pour le routage
@@ -36,7 +57,8 @@ $ ./start.sh
 - [ ] Drag&Drop des posts dans la page de modification -> Trouver une façon optimale de stocker les préférences (serveur ou local) -> c'est loooourd
 - [ ] Système de Permissions
 - [ ] Système de modification de mot de passe
+- [ ] Ajouter un nom de domaine à la machine dans le DNS du réseau local pour ne plus avoir à jouer avec l'IP dans le fichier `utils/config.js`
 
 ### Erreurs possibles
 - Le client ne se met pas à jour: Vérifier que l'adresse IP utilisée pour connecter le socket est bien celle du serveur
-- Crash du client: Vérifier que l'API ne s'est pas arrêtée, si c'est le cas, la relancer avec `./start.sh`
+- Crash du client: Vérifier que l'API ne s'est pas arrêtée, si c'est le cas, la relancer avec `docker compose up -d`

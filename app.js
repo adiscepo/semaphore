@@ -8,12 +8,13 @@ const fetch = require("node-fetch");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const cors = require("cors");
+const ip = conf.ip;
 const port = conf.port;
 const path_api = conf.path_api;
 const port_api = conf.port_api;
 const io = require('socket.io')(server, {
     cors: {
-        origin: ["http://localhost", "http://localhost", "0.0.0.0", "*"],
+        origin: ["*"],
         credentials: true
     }
 });
@@ -56,8 +57,6 @@ app.use(express.static(__dirname + '/utils'));
 app.use('/static', express.static('node_modules'));
 app.use("/utils/icons", express.static('icons')); 
 
-console.log("Program started")
-
 app.get("/", async (req, res, next) => {
     log("[GET] /")
     let response = await fetch("http://" + path_api + ":" + port_api + "/api/user");
@@ -70,7 +69,7 @@ app.get("/", async (req, res, next) => {
         res.render("index.ejs", { 
             users: list_user, 
             userId: req.session.id_user,
-            isLogged: req.session.logged_in 
+            isLogged: req.session.logged_in
         });
     }
 });
@@ -119,7 +118,7 @@ app.get('/view/:_id', async (req, res) => {
         if (response_background.ok) background_info = await response_background.json()
         else                        background_info = "default"
         var datas = await response_post.json();
-        res.render("view.ejs", { port: port, post: datas, background: background_info });
+        res.render("view.ejs", { conf: {ip: ip, port: port}, post: datas, background: background_info });
     }else if (response_post.status == 404) {
         log("Ce post n'existe pas")
         res.redirect("/")
@@ -152,7 +151,7 @@ app.get("/manage/", async (req, res) => {
                 let data_current = await current_background.json()
                 id_current_background = data_current._id
             }
-            res.render("manage.ejs", { port: port, user: data_user, posts: posts, id_current_post: id_current_post, backgrounds: backgrounds, id_current_background: id_current_background });
+            res.render("manage.ejs", { conf: {ip: ip, port: port}, user: data_user, posts: posts, id_current_post: id_current_post, backgrounds: backgrounds, id_current_background: id_current_background });
         }else if (posts_info.status == 404) {
             res.redirect("/")
         }

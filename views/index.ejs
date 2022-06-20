@@ -124,6 +124,8 @@
                     // Check si il y'a une session sauvée sur le browser (cookie), et si oui check si l'id est le même que celui de la card
                     if (document.cookie.match(/^(.*;)?\s*id_user\s*=\s*[^;]+(.*)?$/) == id_card.toString()) {
                         getManageViewScreen()
+                    } else if (is_logged && (id_card.toString() == user_id)) {
+                        getManageViewScreen()
                     }else{
                         modal.classList.remove("hide");
                         modal_passwd.classList.remove("hide");

@@ -129,8 +129,8 @@
     <script src="/js/function.js"></script>
     <script src="/js/modal.js"></script>
     <script>
-    const port = "<%= port %>"
-    console.log(port)
+    const ip = "<%= conf.ip %>"
+    const port = "<%= conf.port %>"
     var id_user = "<%= user._id %>";
     var id_current_post = "<%= id_current_post %>";
     var id_current_background = "<%= id_current_background %>";
@@ -165,7 +165,7 @@
             var id_post = val.id;
             val.addEventListener("click", async (data) => {
                 val.parentElement.dataset.deleted = true // Permet d'éviter que le post ne soit considéré comme "cliqué" dans l'eventListener de la carte (voir fonction ci-dessus)
-                fetch("http://localhost:" + port + "/manage/post/", {
+                fetch("http://" + ip + ":" + port + "/manage/post/", {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json;charset=utf-8'
@@ -211,7 +211,7 @@
             var path_background = val.previousElementSibling.attributes.src.nodeValue;
             val.addEventListener("click", async (data) => {
                 val.parentElement.dataset.deleted = true // Permet d'éviter que le post ne soit considéré comme "cliqué" dans l'eventListener de la carte (voir fonction ci-dessus)
-                fetch("http://localhost:" + port + "/manage/background/", {
+                fetch("http://" + ip + ":" + port + "/manage/background/", {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json;charset=utf-8'

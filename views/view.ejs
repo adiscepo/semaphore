@@ -32,9 +32,10 @@
     </body>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const port = "<%= port %>"
+        const ip = "<%= conf.ip %>"
+        const port = "<%= conf.port %>"
         console.log(port)
-        const socket = io('http://localhost:' + port, { transports : ['websocket'] });
+        const socket = io('http://' + ip + ':' + port, { transports : ['websocket'] });
         socket.on('update_post', (post) => {
             console.log("Socket reçu")
             if (post.id_author == "<%= post.id_author %>"){
