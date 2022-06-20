@@ -1,8 +1,3 @@
 #!/bin/bash
-
-echo "Lancement de l'API"
-node ./api/app.js&
-echo "API lancée"
-echo "Lancement du serveur"
+node api/app.js&
 node app.js&
-echo "C'est bon !"

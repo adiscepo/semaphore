@@ -151,3 +151,19 @@
   #editionprofil *{
     margin: 15px;
   }
+
+  #cestquandmememoiquiaittoutfait{
+    position: absolute;
+    display: flex;
+    font-size: 10px;
+    color: #ccc;
+    bottom: 15px;
+    left: 18%;
+    z-index: 100;
+  }
+
+  @media all (min-width: 400px) {
+    #cestquandmememoiquiaittoutfait{
+      display: none;
+    }
+  }  

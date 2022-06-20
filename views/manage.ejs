@@ -72,7 +72,7 @@
                             <% } else { %>
                                 <div class="content_background" data-deleted="false">
                             <% }%>
-                                    <img data-id_background="<%- background._id %>" src="/img/background/<%- background.path %>" alt="">
+                                    <img draggable="false" data-id_background="<%- background._id %>" src="/img/background/<%- background.path %>" alt="">
                                     <span name="delete_background" class="delete_background" data-id_background="<%- background._id %>">&times;</span>
                                 </div>
                         <% } %>
@@ -129,6 +129,8 @@
     <script src="/js/function.js"></script>
     <script src="/js/modal.js"></script>
     <script>
+    const port = "<%= port %>"
+    console.log(port)
     var id_user = "<%= user._id %>";
     var id_current_post = "<%= id_current_post %>";
     var id_current_background = "<%= id_current_background %>";
@@ -163,7 +165,7 @@
             var id_post = val.id;
             val.addEventListener("click", async (data) => {
                 val.parentElement.dataset.deleted = true // Permet d'éviter que le post ne soit considéré comme "cliqué" dans l'eventListener de la carte (voir fonction ci-dessus)
-                fetch("http://127.0.0.1:1337/manage/post/", {
+                fetch("http://localhost:" + port + "/manage/post/", {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json;charset=utf-8'
@@ -209,7 +211,7 @@
             var path_background = val.previousElementSibling.attributes.src.nodeValue;
             val.addEventListener("click", async (data) => {
                 val.parentElement.dataset.deleted = true // Permet d'éviter que le post ne soit considéré comme "cliqué" dans l'eventListener de la carte (voir fonction ci-dessus)
-                fetch("http://127.0.0.1:1337/manage/background/", {
+                fetch("http://localhost:" + port + "/manage/background/", {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json;charset=utf-8'
@@ -227,6 +229,7 @@
         });
     }
     // CHANGE PASSWORD (Modal)
+    // TODO: change the request to API with a request to server (will made the request to the API by himself -> reduce the couplage) 
     document.getElementById("change_passwd_submit")
     .addEventListener("click", (e) => {
         e.preventDefault()

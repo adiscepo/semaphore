@@ -1,3 +1,4 @@
+const conf = require('./utils/config.json')
 const http = require('http');
 const express = require("express");
 const app = express();
@@ -7,11 +8,19 @@ const fetch = require("node-fetch");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const cors = require("cors");
-const port = 1337;
-const io = require('socket.io')(server, { cors: { origin: '*' } });
+const port = conf.port;
+const path_api = conf.path_api;
+const port_api = conf.port_api;
+const io = require('socket.io')(server, {
+    cors: {
+        origin: ["http://localhost", "http://localhost", "0.0.0.0", "*"],
+        credentials: true
+    }
+});
 var multer = require('multer'); // Pour l'upload d'image
 const fs = require('fs'); // Suppression de fichier
 const VERBOSE = process.argv.includes("-v")
+
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -26,12 +35,6 @@ const upload = multer({ storage: storage }).single("background")
 
 app.use(cors());
 app.set('view-engine', 'ejs');
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    next();
-})
 
 app.use(session({
     secret: generateSecretKey(),
@@ -53,9 +56,11 @@ app.use(express.static(__dirname + '/utils'));
 app.use('/static', express.static('node_modules'));
 app.use("/utils/icons", express.static('icons')); 
 
+console.log("Program started")
+
 app.get("/", async (req, res, next) => {
     log("[GET] /")
-    let response = await fetch("http://127.0.0.1:2021/api/user");
+    let response = await fetch("http://" + path_api + ":" + port_api + "/api/user");
     if (response.ok){
         var datas = await response.json();
         var list_user = {};
@@ -80,7 +85,7 @@ app.post("/add_user", async (req, res, next) => {
     var name    = req.body.name;
     var passwd  = req.body.passwd;
     var user = { name: name, passwd: passwd };
-    let response = await fetch("http://127.0.0.1:2021/api/user", {
+    let response = await fetch("http://" + path_api + ":" + port_api + "/api/user", {
         method: 'POST',
         headers: {
         'Content-Type': 'application/json;charset=utf-8'
@@ -94,7 +99,7 @@ app.post("/add_user", async (req, res, next) => {
 
 app.get('/gate/:_id', async (req, res) => {
     var id = req.params._id;
-    let response = await fetch("http://127.0.0.1:2021/api/user/" + id);
+    let response = await fetch("http://" + path_api + ":" + port_api + "/api/user/" + id);
     if (response.ok) {
         var datas = await response.json();
         res.render("post.ejs", { datas: datas });
@@ -107,14 +112,14 @@ app.get('/gate/:_id', async (req, res) => {
 
 app.get('/view/:_id', async (req, res) => {
     var id = req.params._id;
-    let response_post = await fetch("http://127.0.0.1:2021/api/current/post/" + id);
-    let response_background = await fetch("http://127.0.0.1:2021/api/current/background/" + id);
+    let response_post = await fetch("http://" + path_api + ":" + port_api + "/api/current/post/" + id);
+    let response_background = await fetch("http://" + path_api + ":" + port_api + "/api/current/background/" + id);
     if (response_post.ok) {
         var background_info  = {}
         if (response_background.ok) background_info = await response_background.json()
         else                        background_info = "default"
         var datas = await response_post.json();
-        res.render("view.ejs", { post: datas, background: background_info });
+        res.render("view.ejs", { port: port, post: datas, background: background_info });
     }else if (response_post.status == 404) {
         log("Ce post n'existe pas")
         res.redirect("/")
@@ -126,17 +131,17 @@ app.get('/view/:_id', async (req, res) => {
 app.get("/manage/", async (req, res) => {
     var id = await checkIfUserIsConnected(req)
     if (id) {
-        let posts_info  = await fetch("http://127.0.0.1:2021/api/posts/" + id);
-        let backgrounds_info  = await fetch("http://127.0.0.1:2021/api/backgrounds/" + id);
-        let user_info = await fetch("http://127.0.0.1:2021/api/user/" + id);
+        let posts_info  = await fetch("http://" + path_api + ":" + port_api + "/api/posts/" + id);
+        let backgrounds_info  = await fetch("http://" + path_api + ":" + port_api + "/api/backgrounds/" + id);
+        let user_info = await fetch("http://" + path_api + ":" + port_api + "/api/user/" + id);
         if (user_info.ok) {
             var posts = {}
             var backgrounds = {}
             if (posts_info.ok) posts = await posts_info.json();
             if (backgrounds_info.ok) backgrounds = await backgrounds_info.json();
             var data_user = await user_info.json();
-            let current_post = await fetch("http://127.0.0.1:2021/api/current/post/" + id);
-            let current_background = await fetch("http://127.0.0.1:2021/api/current/background/" + id);
+            let current_post = await fetch("http://" + path_api + ":" + port_api + "/api/current/post/" + id);
+            let current_background = await fetch("http://" + path_api + ":" + port_api + "/api/current/background/" + id);
             var id_current_post       = false 
             var id_current_background = false
             if (current_post.ok){
@@ -147,7 +152,7 @@ app.get("/manage/", async (req, res) => {
                 let data_current = await current_background.json()
                 id_current_background = data_current._id
             }
-            res.render("manage.ejs", { user: data_user, posts: posts, id_current_post: id_current_post, backgrounds: backgrounds, id_current_background: id_current_background });
+            res.render("manage.ejs", { port: port, user: data_user, posts: posts, id_current_post: id_current_post, backgrounds: backgrounds, id_current_background: id_current_background });
         }else if (posts_info.status == 404) {
             res.redirect("/")
         }
@@ -160,7 +165,7 @@ app.put("/manage/post/change_current", (req, res) => {
     var id_user = req.body.id_user
     var id_post = req.body.id_post
     if (checkIfUserIsConnected(req)) {
-        fetch("http://127.0.0.1:2021/api/current/post/", {
+        fetch("http://" + path_api + ":" + port_api + "/api/current/post/", {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
@@ -168,7 +173,7 @@ app.put("/manage/post/change_current", (req, res) => {
             body: JSON.stringify({ id_author: id_user, id_post: id_post })
         }).then(async (response) => {
             if (response.status == 200 || response.status == 202) {
-                let current_post = await fetch("http://127.0.0.1:2021/api/post/" + id_post)
+                let current_post = await fetch("http://" + path_api + ":" + port_api + "/api/post/" + id_post)
                 let current_post_datas = await current_post.json()
                 req.app.io.emit("update_post", current_post_datas)
                 res.status(200).end()
@@ -186,7 +191,7 @@ app.put("/manage/background/change_current", (req, res) => {
     var id_user = req.body.id_user
     var id_background = req.body.id_background
     if (checkIfUserIsConnected(req)) {
-        fetch("http://127.0.0.1:2021/api/current/background/", {
+        fetch("http://" + path_api + ":" + port_api + "/api/current/background/", {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
@@ -194,7 +199,7 @@ app.put("/manage/background/change_current", (req, res) => {
             body: JSON.stringify({ id_author: id_user, id_background: id_background })
         }).then(async (response) => {
             if (response.status == 200 || response.status == 202) {
-                let current_background = await fetch("http://127.0.0.1:2021/api/background/" + id_background)
+                let current_background = await fetch("http://" + path_api + ":" + port_api + "/api/background/" + id_background)
                 let current_background_datas = await current_background.json()
                 req.app.io.emit("update_background", current_background_datas)
                 res.status(200).end()
@@ -212,7 +217,7 @@ app.delete("/manage/post/", (req, res) => {
     var id = checkIfUserIsConnected(req)
     if (id) {
         var id_post = req.body.id_post
-        fetch("http://127.0.0.1:2021/api/post/" + id_post, {
+        fetch("http://" + path_api + ":" + port_api + "/api/post/" + id_post, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
@@ -233,11 +238,11 @@ app.delete("/manage/post/", (req, res) => {
 })
 
 app.delete("/manage/background", async (req, res) => {
-    var id = await checkIfUserIsConnected(req)
+    var id = checkIfUserIsConnected(req)
     if (id) {
         var id_background = req.body.id_background
         var path_to_background = req.body.path
-        fetch("http://127.0.0.1:2021/api/background", {
+        fetch("http://" + path_api + ":" + port_api + "/api/background", {
             method: "DELETE",
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
@@ -267,7 +272,7 @@ app.get("/logout/", (req, res) => {
     if (id) {
         req.session.destroy()
         if (req.cookies.secret_key){
-            fetch("http://127.0.0.1:2021/api/session", {
+            fetch("http://" + path_api + ":" + port_api + "/api/session", {
                 method: "DELETE",
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8'
@@ -292,7 +297,7 @@ app.post("/add_post/:_id", async (req, res) => {
             color: req.body.color,
         }
 
-        let response = await fetch("http://127.0.0.1:2021/api/post", {
+        let response = await fetch("http://" + path_api + ":" + port_api + "/api/post", {
             method: 'POST',
             headers: {
             'Content-Type': 'application/json;charset=utf-8'
@@ -313,7 +318,7 @@ app.post("/register", async (req, res) => {
     var passwd = req.body.passwd
     var stayConnected = req.body.stayConnected
     var credentials = { id: id, passwd: passwd }
-    let response = await fetch("http://127.0.0.1:2021/api/user/check", {
+    let response = await fetch("http://" + path_api + ":" + port_api + "/api/user/check", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8'
@@ -332,7 +337,7 @@ app.post("/register", async (req, res) => {
                 expires: new Date((2**31-1) * 1000),
                 httpOnly: true
             })
-            fetch("http://127.0.0.1:2021/api/session", {
+            fetch("http://" + path_api + ":" + port_api + "/api/session", {
                 method: "POST", 
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8'
@@ -361,7 +366,7 @@ app.post("/add_background/:_id", async (req, res) => {
                     // Ajoute le fichier en bdd
                     var path = res.req.file.filename
                     var background = JSON.stringify({ id_author: id, path: path })
-                    fetch("http://127.0.0.1:2021/api/background/", {
+                    fetch("http://" + path_api + ":" + port_api + "/api/background/", {
                         method: "POST",
                         headers: {
                             'Content-Type': 'application/json;charset=utf-8'
@@ -370,7 +375,7 @@ app.post("/add_background/:_id", async (req, res) => {
                     }).then(async response => {
                         if (response.ok) {
                             let data_background = await response.json()
-                            let current_background = await fetch("http://127.0.0.1:2021/api/background/" + data_background._id)
+                            let current_background = await fetch("http://" + path_api + ":" + port_api + "/api/background/" + data_background._id)
                             let current_background_datas = await current_background.json()
                             req.app.io.emit("update_background", current_background_datas)
                             res.status(200).redirect("/manage")
@@ -402,7 +407,7 @@ io.on('connection', function (socket) {
 async function checkIfUserIsConnected(req) {
     if (req.session.id_user) return req.session.id_user; // L'user s'est connecté cette session
     if (req.cookies.secret_key && req.cookies.id_user) {
-        let response = await fetch("http://127.0.0.1:2021/api/session/" + req.cookies.id_user)
+        let response = await fetch("http://" + path_api + ":" + port_api + "/api/session/" + req.cookies.id_user)
         if (response.ok) {
             let data = await response.json()
             if (data.secret == req.cookies.secret_key && data.id_user == req.cookies.id_user) return req.cookies.id_user

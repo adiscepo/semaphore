@@ -25,9 +25,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Connexion à la base de données
-var mongoDB = "mongodb://127.0.0.1:27017/semaphore";
+var mongoDB = "mongodb://mongo:27017/semaphore";
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 var db = mongoose.connection;
+log("connexion établue à la db")
 db.on('error', (err) => {
    log("Erreur lors de la connexion à la base de données");
 });

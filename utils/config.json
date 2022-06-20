@@ -1,0 +1,5 @@
+{
+    "port": 80,
+    "path_api": "api",
+    "port_api": 2021
+}

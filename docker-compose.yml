@@ -1,0 +1,25 @@
+version: "3"
+services:
+  semaphore:
+    container_name: Semaphore
+    build: .
+    ports:
+      - "80:80"
+    volumes:
+      - background-storage:/usr/src/semaphore/public/img/background
+  api:
+    container_name: Semaphore_api
+    build: api/
+    ports:
+      - "2021:2021"
+    links:
+      - mongo
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - mongo-storage:/data/db
+
+volumes:
+  mongo-storage:
+  background-storage:
